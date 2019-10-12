@@ -6,8 +6,10 @@ import os
 import message.database as db
 import hashlib
 import sqlite3
+from message.roomclass import Room
 app = Flask(__name__)
 app.config['JWT_SECRET'] = os.urandom(64)
+room = dict()
 
 
 @app.before_first_request
@@ -74,6 +76,19 @@ def create_room():
         render_template("index.html")
 
 
+@app.route("/room/<room_name>")
+def join_room(room_name):
+    token = request.cookies["token"]
+    payload = utils.verify_jwt(token)
+    if utils.find_room_and_verify_auth(room_name, payload["username"], payload["auth"]):
+        if room[room_name] is None:
+            room[room_name] = Room(room_name)
+            render_template("index.html")
+        else:
+            user = ""
+            room[room_name].add_user(user)
+    else:
+        abort(404)
 
 
 if __name__ == '__main__':

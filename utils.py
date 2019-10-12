@@ -57,9 +57,12 @@ def verify_user(username, password):
             password_find = row[1]
             auth_find = row[2]
         if password_find == password:
+            conn.close()
             return [user_id, auth_find]
     except IOError:
+        conn.close()
         return None
+    conn.close()
     return None
 
 
@@ -83,7 +86,7 @@ def pass_to_md5(password):
     return hashlib.md5(password.encode(encoding='UTF-8')).hexdigest()
 
 
-def verify_auth(auth, auth_need):
+def verify_auth(auth, auth_need, params_need=None):
     return True
 
 
@@ -94,6 +97,7 @@ def verify_ip(token_ip, ip):
 
 
 def create_room(room_name, description, creator_id, auth_need):
+    conn = None
     try:
         conn = sqlite3.connect("database/waitti_message.db")
         cursor = conn.cursor()
@@ -102,10 +106,36 @@ def create_room(room_name, description, creator_id, auth_need):
             VALUES
             (?, ?, ?, ?)
         ''', (room_name, description, creator_id, auth_need))
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS ?
+            (
+            ID INTEGER PRIMARY KEY,
+            CONTENT TEXT NOT NULL,
+            SEND_DATE TEXT NOT NULL,
+            SEND_USER TEXT NOT NULL
+            );
+        ''', (room_name, ))
         conn.commit()
         conn.close()
         return True
     except IOError:
+        if conn is not None:
+            conn.close()
         return False
-    else:
-        return False
+
+
+def find_room_and_verify_auth(room_name, username, auth):
+    conn = sqlite3.connect("database/waitti_message.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT AUTH_NEED FROM ROOMS WHERE ROOM_NAME = ?
+    ''', (room_name, ))
+    auth_find = None
+    for row in cursor:
+        auth_find = row[0]
+    if auth_find is not None:
+        if verify_auth(auth, auth_find):
+            conn.close()
+            return True
+    conn.close()
+    return False
