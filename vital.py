@@ -7,7 +7,7 @@ import message.database as db
 import hashlib
 import sqlite3
 app = Flask(__name__)
-app.config['JWT_SECRET'] = os.urandom(24)
+app.config['JWT_SECRET'] = os.urandom(64)
 
 
 @app.before_first_request
@@ -26,13 +26,14 @@ def login():
     username = json["username"]
     password = json["password"]
     password = utils.pass_to_md5(password)
-    user_id = utils.verify_user(username, password)
-    if user_id is not None:
-        payload = dict({"id": user_id, "username:": username})
-        expiry = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+    user_info = utils.verify_user(username, password)
+    if user_info is not None:
+        remote_addr = request.remote_addr
+        payload = dict({"id": user_info[0], "username": username, "auth": user_info[1], "ip": remote_addr})
+        expiry = datetime.datetime.utcnow() + datetime.timedelta(hours=2)
         jwt_code = utils.generate_jwt(payload, expiry)
         resp = make_response("")
-        resp.headers["Set-Cookie"] = "token=" + str(jwt_code)
+        resp.headers["Set-Cookie"] = "token=" + str(jwt_code, encoding='UTF-8') + ";Path=/;" + "HttpOnly"
         return resp
     else:
         abort(401)
@@ -53,12 +54,26 @@ def sign():
         return "USER EXISTS"  # 同上
 
 
-
-
-
 @app.route("/create_room")
 def create_room():
-    r = request.json["s"]
+    token = request.cookies["token"]
+    payload = utils.verify_jwt(token)
+    if payload is not None and utils.verify_ip(token["ip"], request.remote_addr):
+        if utils.verify_auth(payload["auth"], "USER"):
+            json = request.json
+            room_name = json["room_name"]
+            description = json["description"]
+            auth_need = json["auth_need"]
+            if utils.create_room(room_name, description, payload["id"], auth_need):
+                return "Success"  # 重定向到该房间
+            else:
+                return "False"
+        else:
+            render_template("index.html")
+    else:
+        render_template("index.html")
+
+
 
 
 if __name__ == '__main__':

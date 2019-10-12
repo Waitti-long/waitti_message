@@ -18,7 +18,7 @@ def database_connect():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS ROOMS
         (
-        ID INT PRIMARY KEY NOT NULL ,
+        ID INTEGER PRIMARY KEY,
         ROOM_NAME TEXT NOT NULL,
         DESCRIPTION TEXT NOT NULL,
         CREATOR_ID TEXT NOT NULL,

@@ -35,6 +35,7 @@ def verify_jwt(token, secret=None):
 
     try:
         payload = jwt.decode(token, secret, algorithm=['HS256'])
+
     except jwt.PyJWTError:
         payload = None
 
@@ -45,16 +46,18 @@ def verify_user(username, password):
     conn = sqlite3.connect("database/waitti_message.db")
     cursor = conn.cursor()
     result = cursor.execute('''
-        SELECT ID,PASSWORD FROM USERS WHERE USERNAME = ?
+        SELECT ID,PASSWORD,AUTH FROM USERS WHERE USERNAME = ?
     ''', (username, ))
     user_id = None
     password_find = None
+    auth_find = None
     try:
         for row in result:
             user_id = row[0]
             password_find = row[1]
+            auth_find = row[2]
         if password_find == password:
-            return user_id
+            return [user_id, auth_find]
     except IOError:
         return None
     return None
@@ -78,3 +81,31 @@ def add_user(username, nickname, password, mailbox):
 
 def pass_to_md5(password):
     return hashlib.md5(password.encode(encoding='UTF-8')).hexdigest()
+
+
+def verify_auth(auth, auth_need):
+    return True
+
+
+def verify_ip(token_ip, ip):
+    if token_ip == ip:
+        return True
+    return False
+
+
+def create_room(room_name, description, creator_id, auth_need):
+    try:
+        conn = sqlite3.connect("database/waitti_message.db")
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO ROOMS (ROOM_NAME, DESCRIPTION, CREATOR_ID, AUTH_NEED)
+            VALUES
+            (?, ?, ?, ?)
+        ''', (room_name, description, creator_id, auth_need))
+        conn.commit()
+        conn.close()
+        return True
+    except IOError:
+        return False
+    else:
+        return False
