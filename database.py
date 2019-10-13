@@ -12,7 +12,8 @@ def database_connect():
         NICKNAME TEXT NOT NULL,
         PASSWORD TEXT NOT NULL,
         MAILBOX TEXT NOT NULL,
-        AUTH TEXT NOT NULL
+        AUTH TEXT NOT NULL,
+        AVATAR TEXT
         );
     ''')
     cursor.execute('''

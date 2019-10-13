@@ -10,3 +10,6 @@ class Room:
 
     def remove_user(self, user):
         self._users.remove(user)
+
+    def list_users(self):
+        return self._users

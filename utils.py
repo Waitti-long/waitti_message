@@ -111,7 +111,8 @@ def create_room(room_name, description, creator_id, auth_need):
                        ID INTEGER PRIMARY KEY,
                        CONTENT TEXT NOT NULL,
                        SEND_DATE TEXT NOT NULL,
-                       SEND_USER TEXT NOT NULL
+                       SEND_USER TEXT NOT NULL,
+                       AVATAR TEXT
                        );
                    ''')
         conn.commit()
@@ -138,3 +139,17 @@ def find_room_and_verify_auth(room_name, username, auth):
             return True
     conn.close()
     return False
+
+
+def list_room_record(room_name):
+    conn = sqlite3.connect("database/waitti_message.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+            SELECT CONTENT,SEND_DATE,SEND_USER,AVATAR FROM
+        ''' + room_name.upper())
+    ans_list = []
+    for row in cursor:
+        ans_list.append({"content": row[0], "send_date": row[1], "send_user": row[2], "avatar": row[3]})
+    conn.close()
+    return ans_list
+

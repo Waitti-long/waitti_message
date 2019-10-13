@@ -34,7 +34,7 @@ POST http://localhost:5000/create_room
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-Cookie: token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzA5NTA1NDIsImlhdCI6MTU3MDk0MzM0MiwiaWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImF1dGgiOiJVU0VSIiwiaXAiOiIxMjcuMC4wLjEifQ.cU5Ceu2Q1ueRhuD9838FWrMx0YILUt_9ItibUxEDElI;
+Cookie: token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzA5NTY3OTMsImlhdCI6MTU3MDk0OTU5MywiaWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImF1dGgiOiJVU0VSIiwiaXAiOiIxMjcuMC4wLjEifQ.7jnIjPw2ddQciUucTZ_PML7El-1KfsTX9ZbxjSH9k3o;
 
 {
   "room_name":"test",

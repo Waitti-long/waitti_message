@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+<script>
+    $(function () {
+        $("#submit").bind("click", function () {
+            let log = {};
+            log.username = $("#username").val();
+            log.password = $("#password").val();
+            $.ajax("/login", {
+                //请求方式
+                type: "POST",
+                //请求的媒体类型
+                contentType: "application/json;charset=UTF-8",
+                //请求头
+                headers: {},
+                //数据，json字符串
+                data: JSON.stringify(log),
+                //请求成功
+                success: function (result) {
+                    console.log(result);
+                },
+                //请求失败，包含具体的错误信息
+                error: function (e) {
+                    console.log(e.status);
+                    console.log(e.responseText);
+                }
+            });
+        })
+    })
+</script>
+<body>
+<form>
+    <label for="username">Username: </label><input id="username" type="text">
+    <label for="password">Password: </label><input id="password" type="password">
+    <button id="submit">Login</button>
+</form>
+</body>
+</html>
