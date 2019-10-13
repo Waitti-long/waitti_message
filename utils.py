@@ -47,7 +47,7 @@ def verify_user(username, password):
     cursor = conn.cursor()
     result = cursor.execute('''
         SELECT ID,PASSWORD,AUTH FROM USERS WHERE USERNAME = ?
-    ''', (username, ))
+    ''', (username,))
     user_id = None
     password_find = None
     auth_find = None
@@ -106,15 +106,14 @@ def create_room(room_name, description, creator_id, auth_need):
             VALUES
             (?, ?, ?, ?)
         ''', (room_name, description, creator_id, auth_need))
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS ?
-            (
-            ID INTEGER PRIMARY KEY,
-            CONTENT TEXT NOT NULL,
-            SEND_DATE TEXT NOT NULL,
-            SEND_USER TEXT NOT NULL
-            );
-        ''', (room_name, ))
+        cursor.execute('''CREATE TABLE IF NOT EXISTS ''' + room_name.upper() +
+                       ''' (
+                       ID INTEGER PRIMARY KEY,
+                       CONTENT TEXT NOT NULL,
+                       SEND_DATE TEXT NOT NULL,
+                       SEND_USER TEXT NOT NULL
+                       );
+                   ''')
         conn.commit()
         conn.close()
         return True
@@ -129,7 +128,7 @@ def find_room_and_verify_auth(room_name, username, auth):
     cursor = conn.cursor()
     cursor.execute('''
         SELECT AUTH_NEED FROM ROOMS WHERE ROOM_NAME = ?
-    ''', (room_name, ))
+    ''', (room_name,))
     auth_find = None
     for row in cursor:
         auth_find = row[0]

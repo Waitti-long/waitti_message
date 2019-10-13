@@ -1,11 +1,8 @@
 from flask import Flask, request, url_for, render_template, abort, make_response
-import message.database
 import datetime
 import message.utils as utils
 import os
 import message.database as db
-import hashlib
-import sqlite3
 from message.roomclass import Room
 app = Flask(__name__)
 app.config['JWT_SECRET'] = os.urandom(64)
@@ -35,7 +32,7 @@ def login():
         expiry = datetime.datetime.utcnow() + datetime.timedelta(hours=2)
         jwt_code = utils.generate_jwt(payload, expiry)
         resp = make_response("")
-        resp.headers["Set-Cookie"] = "token=" + str(jwt_code, encoding='UTF-8') + ";Path=/;" + "HttpOnly"
+        resp.headers["Set-Cookie"] = "token=" + str(jwt_code, encoding='UTF-8') + ";Path=/;HttpOnly;expires:" + str(expiry) + ";"
         return resp
     else:
         abort(401)
@@ -56,11 +53,11 @@ def sign():
         return "USER EXISTS"  # 同上
 
 
-@app.route("/create_room")
+@app.route("/create_room", methods=["POST"])
 def create_room():
     token = request.cookies["token"]
     payload = utils.verify_jwt(token)
-    if payload is not None and utils.verify_ip(token["ip"], request.remote_addr):
+    if payload is not None and utils.verify_ip(payload["ip"], request.remote_addr):
         if utils.verify_auth(payload["auth"], "USER"):
             json = request.json
             room_name = json["room_name"]
@@ -71,22 +68,23 @@ def create_room():
             else:
                 return "False"
         else:
-            render_template("index.html")
+            return render_template("index.html")
     else:
-        render_template("index.html")
+        return render_template("index.html")
 
 
-@app.route("/room/<room_name>")
+@app.route("/room/<room_name>", methods=["POST"])
 def join_room(room_name):
     token = request.cookies["token"]
     payload = utils.verify_jwt(token)
     if utils.find_room_and_verify_auth(room_name, payload["username"], payload["auth"]):
-        if room[room_name] is None:
+        if room_name not in room:
             room[room_name] = Room(room_name)
-            render_template("index.html")
+            return render_template("index.html")
         else:
             user = ""
             room[room_name].add_user(user)
+            return render_template("index.html")
     else:
         abort(404)
 
