@@ -13,3 +13,9 @@ class Room:
 
     def list_users(self):
         return self._users
+
+    def has_user(self, username):
+        for user in self._users:
+            if user.get_username() == username:
+                return True
+        return False

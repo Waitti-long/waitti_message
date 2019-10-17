@@ -153,3 +153,17 @@ def list_room_record(room_name):
     conn.close()
     return ans_list
 
+
+def insert_one_message(message, room_name, username):
+    conn = sqlite3.connect("database/waitti_message.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO 
+        ''' + room_name + '''
+        (CONTENT, SEND_DATE, SEND_USER, AVATAR)
+        VALUES
+        (?, ?, ?, ?)
+        ''', (message, datetime.datetime.utcnow(), username, None))
+    conn.commit()
+    conn.close()
+

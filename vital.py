@@ -1,4 +1,4 @@
-from flask import Flask, request, url_for, render_template, abort, make_response
+from flask import Flask, request, url_for, redirect, render_template, abort, make_response
 import datetime
 import message.utils as utils
 import os
@@ -80,6 +80,8 @@ def create_room():
 def join_room(room_name):
     token = request.cookies["token"]
     payload = utils.verify_jwt(token)
+    if payload is None:
+        return render_template("login_html.html")
     if utils.find_room_and_verify_auth(room_name, payload["username"], payload["auth"]):
         user = User(payload["id"], payload["username"], payload["auth"], room_name)
         if room_name not in room:
@@ -90,6 +92,24 @@ def join_room(room_name):
         return render_template("index.html", room_name=room_name, infos=info_list)
     else:
         abort(404)
+
+
+@app.route("/send", methods=["POST"])
+def send_message():
+    token = request.cookies["token"]
+    payload = utils.verify_jwt(token)
+    if payload is None:
+        return render_template("login_html.html")
+    json = request.json
+    room_name = json["room_name"]
+    if room_name not in room:
+        return "Cant't find this room."
+    if room[room_name].has_user(payload["username"]):
+        message = json["message"]
+        if message == "":
+            return "Message can't be empty"
+        utils.insert_one_message(message, room_name, payload["username"])
+        return redirect("/room/" + room_name)
 
 
 if __name__ == '__main__':
