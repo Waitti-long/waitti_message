@@ -87,7 +87,7 @@ def pass_to_md5(password):
 
 
 def verify_auth(auth, auth_need, params_need=None):
-    return True
+    return auth == auth_need
 
 
 def verify_ip(token_ip, ip):

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Log in</title>
+    <title>Sign up</title>
     <link rel="stylesheet" type="text/css" href="../static/login.css">
     <link rel="stylesheet" type="text/css" href="../static/index.css">
     <link rel="stylesheet" type="text/css" href="../static/bootstrap-4.3.1-dist/css/bootstrap.min.css">
@@ -14,7 +14,10 @@
             let log = {};
             log.username = $("#username").val();
             log.password = $("#password").val();
-            $.ajax("/login", {
+            log.nickname = $("#nickname").val();
+            log.mailbox = $("#mailbox").val();
+            alert("并不知道能否注册成功，试着登陆一下就知道了");
+            $.ajax("/sign", {
                 //请求方式
                 type: "POST",
                 //请求的媒体类型
@@ -24,25 +27,21 @@
                 //数据，json字符串
                 data: JSON.stringify(log),
                 //请求成功
-                success: function (result) {
+                success: function () {
+                    alert("即将跳转...如不跳转，请自行访问/join或/room/room_name");
                     window.location.replace("/join");
                 },
                 //请求失败，包含具体的错误信息
                 error: function (e) {
-                    alert("登陆失败")
+                    alert("注册失败")
                 }
             });
-        });
-        $("#sign").bind("click", function () {
-            alert("即将跳转，如不跳转，请自行访问/signup");
-            alert("如果要创建房间，请访问/create，收不到别人信息的话试着刷新一下");
-            window.location.replace("/signup");
         });
     })
 </script>
 <body class="graient">
 
-<h1 class="text-center faraway_top">Login in</h1>
+<h1 class="text-center faraway_top">Sign up</h1>
 <div class="container faraway">
     <div class="center-block">
         <form role="form">
@@ -54,11 +53,18 @@
                 <label for="password"><strong>Password: </strong></label>
                 <input id="password" type="password" class="form-control">
             </div>
+            <div class="form-group">
+                <label for="nickname"><strong>Nickname: </strong></label>
+                <input id="nickname" type="text" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="mailbox"><strong>Mailbox: </strong></label>
+                <input id="mailbox" type="text" class="form-control">
+            </div>
             <br/><br/>
-            <button class="btn btn-danger form-control" id="submit">Log in</button>
+            <button class="btn btn-danger form-control" id="submit">Sign up</button>
             <br/><br/>
-            <a class="btn btn-danger form-control" id="sign_2" href="{{ url_for('sign_up_o') }}">Without Account? Sign up</a>
-
+            <a class="btn btn-danger form-control" id="login_2" href="{{ url_for('login2') }}">Have an Account? Log in</a>
         </form>
     </div>
 

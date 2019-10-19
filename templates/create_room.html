@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Log in</title>
+    <title>Create Room</title>
     <link rel="stylesheet" type="text/css" href="../static/login.css">
     <link rel="stylesheet" type="text/css" href="../static/index.css">
     <link rel="stylesheet" type="text/css" href="../static/bootstrap-4.3.1-dist/css/bootstrap.min.css">
@@ -12,9 +12,11 @@
     $(function () {
         $("#submit").bind("click", function () {
             let log = {};
-            log.username = $("#username").val();
-            log.password = $("#password").val();
-            $.ajax("/login", {
+            log.room_name = $("#room_name").val();
+            log.description = $("#description").val();
+            log.auth_need = $("#auth").val();
+            alert("并不知道能不能创建成功，试着按照/room/name的格式访问一下");
+            $.ajax("/create_room", {
                 //请求方式
                 type: "POST",
                 //请求的媒体类型
@@ -25,40 +27,40 @@
                 data: JSON.stringify(log),
                 //请求成功
                 success: function (result) {
-                    window.location.replace("/join");
+
                 },
                 //请求失败，包含具体的错误信息
                 error: function (e) {
-                    alert("登陆失败")
+                    alert("创建失败")
                 }
             });
-        });
-        $("#sign").bind("click", function () {
-            alert("即将跳转，如不跳转，请自行访问/signup");
-            alert("如果要创建房间，请访问/create，收不到别人信息的话试着刷新一下");
-            window.location.replace("/signup");
-        });
+        })
     })
 </script>
 <body class="graient">
 
-<h1 class="text-center faraway_top">Login in</h1>
+<h1 class="text-center faraway_top">Create Room</h1>
 <div class="container faraway">
     <div class="center-block">
         <form role="form">
             <div class="form-group">
-                <label for="username"><strong>Username: </strong></label>
-                <input id="username" type="text" class="form-control">
+                <label for="room_name"><strong>Room Name: </strong></label>
+                <input id="room_name" type="text" class="form-control">
             </div>
             <div class="form-group">
-                <label for="password"><strong>Password: </strong></label>
-                <input id="password" type="password" class="form-control">
+                <label for="description"><strong>Description: </strong></label>
+                <input id="description" type="text" class="form-control">
+            </div>
+            <div class="form-group text-center center-block">
+                <label><strong>Who can join?</strong>
+                    <select id="auth" class="btn btn-dark">
+                        <option value="users">All Users</option>
+                        <option value="choose">Later choose</option>
+                    </select>
+                </label>
             </div>
             <br/><br/>
-            <button class="btn btn-danger form-control" id="submit">Log in</button>
-            <br/><br/>
-            <a class="btn btn-danger form-control" id="sign_2" href="{{ url_for('sign_up_o') }}">Without Account? Sign up</a>
-
+            <button class="btn btn-danger form-control" id="submit">Create Room</button>
         </form>
     </div>
 

@@ -22,6 +22,16 @@ def home():
     return render_template("login_html.html")
 
 
+@app.route("/signup")
+def sign_up_o():
+    return render_template("register.html")
+
+
+@app.route("/login", methods=["GET"])
+def login2():
+    return render_template("login_html.html")
+
+
 @app.route("/login", methods=["POST"])
 def login():
     json = request.json
@@ -48,12 +58,19 @@ def sign():
     nickname = json["nickname"]
     password = json["password"]
     mailbox = json["mailbox"]
+    if len(username) > 16 or len(nickname) > 16 or len(password) > 64 or len(mailbox) > 64:
+        return "Sorry"
     password = utils.pass_to_md5(password)
     if utils.verify_user(username, password) is None:
         utils.add_user(username, nickname, password, mailbox)
-        return "Success"  # 后期换成成功页面
+        return render_template("index.html")
     else:
-        return "USER EXISTS"  # 同上
+        return "USER EXISTS"
+
+
+@app.route("/create", methods=["GET"])
+def create():
+    return render_template("create_room.html")
 
 
 @app.route("/create_room", methods=["POST"])
@@ -66,6 +83,7 @@ def create_room():
             room_name = json["room_name"]
             description = json["description"]
             auth_need = json["auth_need"]
+            auth_need = "USER"
             if utils.create_room(room_name, description, payload["id"], auth_need):
                 return "Success"  # 重定向到该房间
             else:
@@ -74,6 +92,11 @@ def create_room():
             return render_template("index.html")
     else:
         return render_template("index.html")
+
+
+@app.route("/join")
+def join():
+    return render_template("join_room.html")
 
 
 @app.route("/room/<room_name>", methods=["GET", "POST"])
@@ -108,9 +131,11 @@ def send_message():
         message = json["message"]
         if message == "":
             return "Message can't be empty"
+        if len(message) > 32:
+            return "Sorry"
         utils.insert_one_message(message, room_name, payload["username"])
         return redirect("/room/" + room_name)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
